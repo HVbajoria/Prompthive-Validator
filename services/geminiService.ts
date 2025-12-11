@@ -1,12 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ValidationResult } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
  * Generates an image based on a prompt.
- * Uses gemini-3-pro-image-preview for high-quality assessment target images.
+ * Uses gemini-2.5-flash-image for reliable access.
  */
 export const generateImage = async (prompt: string): Promise<string> => {
   if (!prompt || !prompt.trim()) {
@@ -15,14 +14,14 @@ export const generateImage = async (prompt: string): Promise<string> => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview', 
+      model: 'gemini-2.5-flash-image', 
       contents: {
         parts: [{ text: prompt }],
       },
       config: {
         imageConfig: {
             aspectRatio: "1:1",
-            imageSize: "1K"
+            // imageSize is not supported in gemini-2.5-flash-image
         }
       }
     });
@@ -200,7 +199,6 @@ export const generateRandomPromptQuestion = async (
   prompt = prompt.replace(/^["']|["']$/g, '').replace(/\*\*/g, '').trim();
 
   // 2. Generate the image for it
-  // This might fail if the prompt is still unsafe, but the systemPrompt above tries to mitigate it.
   try {
     const image = await generateImage(prompt);
     return { prompt, image };

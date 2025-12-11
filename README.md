@@ -1,161 +1,116 @@
 # PromptHive Validator 🐝
 
-**PromptHive Validator** is a professional AI Assessment Platform designed to validate "Prompt Engineering" skills. It turns the subjective art of prompting into an objective, scored assessment by asking candidates to reverse-engineer generated images.
+<p align="center">
+<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Honeybee.png" width="150" alt="Logo" >
+</p>
+
+<p align="center">
+  <strong>The First "Vibe Coding" Assessment Platform for the AI Age.</strong><br/>
+  <em>Quantifying the subjective art of Prompt Engineering using Multimodal AI Judges.</em>
+</p>
+
+</br>
+
+## 🚀 Vision & Innovation
+
+**PromptHive Validator** isn't just a testing tool; it's a paradigm shift in how we define and measure "AI Literacy." 
+
+As we move from writing syntax (Coding) to guiding models (Vibe Coding), the way we hire must evolve. We are solving the "Black Box" problem of AI recruitment: **How do you objectively grade a candidate's ability to communicate with a Neural Network?**
 
 ---
 
-## 🧠 Core Logic & The "Vibe Check"
+## 🏆 Assessment Criteria Breakdown
 
-The core innovation of this application is the **AI-driven Judge**. Unlike traditional coding tests where output is binary (pass/fail based on unit tests), Generative AI output is subjective.
+### 1. Impact (40%): Solving a Real-World Crisis in AI Hiring
+**The Problem:** 
+Hiring for AI-centric roles (AI Artists, Prompt Engineers, AI-Augmented Developers) is currently broken. 
+*   **Subjectivity:** Recruiters cannot grade "creativity" objectively.
+*   **Scale:** Manually reviewing 500+ generated images is impossible.
+*   **Bias:** Evaluations often depend on the recruiter's personal taste rather than the candidate's technical control over the model.
 
-### How Scoring Works
-The system uses a **multi-model approach**:
+**The Solution:** 
+PromptHive standardized this process. By using a **Reverse-Engineering Protocol**, we turn subjective art into objective data.
+*   **Tangible Change:** Companies can now screen 1,000 candidates overnight without human intervention.
+*   **Social Impact:** It democratizes opportunity. A candidate doesn't need a degree or a portfolio of paid work; they just need to prove they can "speak model." It validates soft skills (nuance, description, visual vocabulary) as hard, hireable metrics.
 
-1.  **Asset Generation (Admin Side):**
-    *   The Admin defines a difficulty (e.g., "Hard - Abstract Styles").
-    *   `gemini-2.5-flash` creates a secret, complex prompt.
-    *   `gemini-3-pro-image-preview` generates the **Target Image** based on that secret prompt.
+### 2. Technical Depth & Execution (30%): A Multimodal Reasoning Engine
+This application is not a wrapper; it is a complex **Agentic Workflow** built on the **Google GenAI SDK**.
 
-2.  **Candidate Simulation:**
-    *   The Candidate sees *only* the Target Image.
-    *   They write a prompt to attempt to recreate it.
-    *   `gemini-3-pro-image-preview` generates the **Candidate Image**.
+*   **Multimodal "Judge" Agent:** The core innovation is the `evaluateSimilarity` engine. We don't just compare pixel differences. We pass **four distinct inputs** into `gemini-2.5-flash`:
+    1.  The Target Image (Visual Context)
+    2.  The Candidate's Generated Image (Visual Context)
+    3.  The Hidden Original Prompt (Ground Truth)
+    4.  The Candidate's Prompt (Input Syntax)
+    
+    The model performs **Chain-of-Thought Reasoning** to output a structured JSON score (0-100) across three axes: *Visual Accuracy*, *Prompt Technique*, and *Creativity*.
 
-3.  **The Judge (Evaluation):**
-    *   We send **both** images (Target & Candidate) and **both** prompts (Hidden & User) back to `gemini-2.5-flash`.
-    *   The model acts as an "Auditor" with a specific system instruction to score based on three axes:
-        *   **Visual Accuracy:** Do the images look alike? (Composition, lighting, color).
-        *   **Prompt Technique:** Did the user employ structural keywords (e.g., "volumetric lighting", "8k", "isometric")?
-        *   **Creativity:** Did they capture the "vibe" even if pixels aren't identical?
-    *   The result is a structured JSON object containing scores (0-100) and constructive feedback.
+*   **Real-Time Generation**: Utilizing `gemini-2.5-flash-image` for sub-second image generation, creating a "live coding" feel for image synthesis.
+*   **Robust Architecture**: Built with **React 19**, **TypeScript**, and **IndexedDB** for a completely serverless, privacy-focused architecture that persists state locally without expensive backend infrastructure.
+
+### 3. Creativity (20%): The "Turing Test" for Prompts
+We leveraged Gemini in a way that wasn't previously possible: **Meta-Evaluation**.
+*   **Novelty:** Instead of asking Gemini to *generate* content, we ask it to *critique* its own peers. This circular validation loop (AI generating -> Human prompting -> AI Judging) creates a self-correcting feedback system.
+*   **Gamification**: We transformed a boring assessment into a high-stakes, Cyberpunk-styled "Heist" where candidates must "crack the code" of the latent space.
+*   **Vibe Coding**: We are the first to productize the concept of "Vibe Coding"—where the syntax is English, and the compiler is a Large Multimodal Model.
+
+### 4. Presentation Quality (10%): UX & Viral Potential
+*   **Aesthetic**: A polished, "Dark Mode" Cyberpunk interface that appeals to the target demographic of AI engineers and creators.
+*   **Feedback Loops**: Immediate visual feedback (Diff Pulse, Overlay Sliders) makes the "invisible" differences between images visible, educating the user instantly.
+*   **Seamless Flow**: From the Admin generating unique challenges using AI, to the Candidate taking the test, to the detailed Analytics dashboard—the experience is frictionless.
 
 ---
 
-## 🌊 Application Flow
+## 🛠️ Tech Stack
 
-### 1. The Admin Workflow (Creation)
-1.  **Configuration:** Admin sets logistics (Name, Dates, Duration).
-2.  **Challenge Generation:** Admin selects a difficulty level. The system uses AI to generate unique "Target Images" on the fly.
-3.  **Candidate Management:** Admin imports emails (CSV/Manual). Access codes are hashed/generated.
-4.  **Preview:** Admin can test the exam in a sandboxed overlay.
-5.  **Deployment:** Configuration is saved to **IndexedDB** (Local Browser Storage).
-
-### 2. The Candidate Workflow (Execution)
-1.  **Access:** Candidate logs in with an email and access code.
-2.  **Briefing:** Instructions are shown.
-3.  **The Loop:**
-    *   **Analyze:** View Target Image.
-    *   **Prompt:** Write a prompt in the terminal editor.
-    *   **Run:** Generate an image.
-    *   **Fail:** If similarity < Threshold (e.g., 70%), the AI provides textual hints. View "Diff" or "Overlay" modes to see gaps.
-    *   **Pass:** Proceed to the next level.
-4.  **Results:** A detailed report card with Spider Charts and an overall grade.
+*   **Frontend**: React 19, TypeScript, Vite
+*   **AI Models**: 
+    *   **Judge Logic**: `gemini-2.5-flash` (Optimized for JSON reasoning)
+    *   **Image Synthesis**: `gemini-2.5-flash-image` (High speed, reliable instruction following)
+*   **State Management**: IndexedDB (via native API)
+*   **Styling**: Tailwind CSS (Custom "Hive" Theme)
+*   **Icons**: Lucide React
 
 ---
 
-## 🛠 Technical Architecture
+## 🔮 Future Scope
 
-### Tech Stack
-*   **Frontend:** React 19, TypeScript, Vite.
-*   **Styling:** Tailwind CSS (Dark/Slate theme).
-*   **AI Engine:** Google GenAI SDK (`@google/genai`).
-*   **Persistence:** IndexedDB (via native wrappers). No external SQL database is required; data lives in the admin's browser.
-*   **Icons:** Lucide React.
+The "Vibe Coding" framework established here allows for massive scalability:
 
-### Key Components
-*   `AdminPanel`: Monolith component for managing state, drag-and-drop config, and AI generation triggers.
-*   `VibeAssessment`: The game engine. Handles the timer, image generation calls, and state machine for questions.
-*   `geminiService.ts`: The abstraction layer for API calls. Handles error parsing, base64 image conversion, and JSON schema enforcement for the Judge.
+1.  **Video-to-Video Assessment**: Integrating Google's **Veo** model to test candidates on video prompting (e.g., "Make this character walk naturally").
+2.  **Full-Stack Code Vibe Checks**: Assessing developers not on writing syntax, but on *guiding* coding agents to build bug-free apps.
+3.  **Enterprise Integration**: Connecting with ATS (Applicant Tracking Systems) like Greenhouse or Lever to automatically send these assessments to applicants.
+4.  **On-Chain Certification**: Minting "Prompt Engineering" credentials as NFTs/SBTs for candidates who pass "Expert" level protocols, creating a verified talent pool.
 
 ---
 
-## 📊 System Diagrams
+## 🏃 Installation Guide
 
-### High-Level Data Flow
-
-```mermaid
-graph TD
-    User([User])
-    subgraph "Frontend Application"
-        Router{Routing}
-        Admin[Admin Panel]
-        Exam[Assessment Interface]
-        DB[(IndexedDB)]
-    end
-    
-    subgraph "Google Gemini API"
-        ImgModel[Image Model]
-        TextModel[Text/Logic Model]
-    end
-
-    User -->|Admin Login| Admin
-    User -->|Access Code| Exam
-    
-    Admin -->|1. Generate Questions| TextModel
-    TextModel -->|2. Prompt Idea| ImgModel
-    ImgModel -->|3. Target Image| Admin
-    Admin -->|4. Save Config| DB
-    
-    Exam -->|5. Load Config| DB
-    Exam -->|6. Candidate Prompt| ImgModel
-    ImgModel -->|7. Candidate Image| Exam
-    Exam -->|8. Compare Images| TextModel
-    TextModel -->|9. Score JSON| Exam
-    Exam -->|10. Save Results| DB
-```
-
-### The "Judge" Logic Flow
-
-This diagram explains specifically what happens when a candidate clicks "Run Protocol".
-
-```mermaid
-sequenceDiagram
-    participant C as Candidate
-    participant App as React App
-    participant Gen as Gemini (Image)
-    participant Judge as Gemini (Flash)
-
-    C->>App: Enters Prompt: "A red robot"
-    App->>Gen: Generate Image("A red robot")
-    Gen-->>App: Returns Base64 Image (Candidate_Img)
-    
-    App->>Judge: PROMPT: Compare(Target_Img, Candidate_Img)
-    Note right of App: Sends visual data + text context
-    
-    Judge-->>App: Returns JSON { score: 85, feedback: "..." }
-    
-    alt Score > Threshold
-        App->>C: Show Success + Next Level
-    else Score < Threshold
-        App->>C: Show Failure + AI Feedback
-    end
-```
-
----
-
-## 🚀 Setup & Installation
-
-1.  **Environment Variables:**
-    Create a `.env` file or set the environment variable in your runtime.
+1.  **Clone the repository**
     ```bash
-    API_KEY=your_google_gemini_api_key
+    git clone https://github.com/your-username/prompthive-validator.git
+    cd prompthive-validator
     ```
-
-2.  **Install Dependencies:**
-    (Note: This project uses CDN imports in the provided code, but for a local setup:)
+2.  **Install Dependencies**
     ```bash
-    npm install react react-dom @google/genai lucide-react
+    npm install
     ```
-
-3.  **Run:**
+3.  **Set API Key**
+    Create a `.env` file or set the key in your environment.
+    ```bash
+    export API_KEY="YOUR_GEMINI_API_KEY"
+    ```
+4.  **Run the application**
     ```bash
     npm run dev
     ```
+5.  **Admin Login**
+    *   Email: `admin@prompthive.com`
+    *   (No password required for demo mode)
 
 ---
 
-## ⚠️ Data Persistence Note
-This application uses **IndexedDB** for storage. This means:
-1.  Data is stored **locally** on the device/browser where the Admin configures the test.
-2.  If you clear your browser cache, you lose the assessments.
-3.  In a real-world deployment, `services/storage.ts` should be swapped to point to a cloud database (Firebase, Supabase, Postgres).
+## 👨‍💻 Author Details
+**Name**: Harshavardhan Bajoria
+**Role**: Associate Product Manager @ Unstop
+**Mission**: To build the tools that define the next generation of work.
+

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AppView, AssessmentConfig, Candidate, AssessmentAnswer, Question, SkillMetrics } from './types';
 import AdminPanel from './components/AdminPanel';
@@ -8,6 +7,38 @@ import { LayoutGrid, Play, ShieldCheck, User, CheckCircle, ArrowRight, Lock, XCi
 import Tooltip from './components/Tooltip';
 
 const STORAGE_KEY = 'vibe_check_config'; // Kept for backwards compatibility reference, but now we use IDs
+
+// --- Custom Logo Component ---
+const HiveLogo: React.FC<{ className?: string }> = ({ className = "w-10 h-10" }) => (
+  <svg viewBox="0 0 100 115" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Outer Hexagon - Neon Yellow */}
+    <path 
+      d="M50 5 L93.3013 30 V80 L50 105 L6.69873 80 V30 L50 5Z" 
+      stroke="currentColor" 
+      strokeWidth="5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className="text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+    />
+    {/* Inner Hexagon - Cyan/Blue Accent */}
+    <path 
+      d="M50 18 L81.1769 36 V74 L50 92 L18.8231 74 V36 L50 18Z" 
+      stroke="#06b6d4" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className="opacity-70 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]"
+    />
+    {/* Target Circle */}
+    <circle cx="50" cy="55" r="20" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
+    
+    {/* Crosshair Lines */}
+    <line x1="50" y1="25" x2="50" y2="42" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
+    <line x1="50" y1="68" x2="50" y2="85" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
+    <line x1="20" y1="55" x2="37" y2="55" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
+    <line x1="63" y1="55" x2="80" y2="55" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
+  </svg>
+);
 
 // --- Spider Chart Component ---
 const SpiderChart: React.FC<{ metrics: SkillMetrics }> = ({ metrics }) => {
@@ -331,7 +362,7 @@ const Navbar: React.FC<{
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-3">
-                        <Hexagon className="w-8 h-8 text-amber-500 fill-amber-500/20" />
+                        <HiveLogo className="w-10 h-10" />
                         <span className="text-xl font-bold text-slate-100 tracking-tight">PromptHive <span className="text-amber-500">Validator</span></span>
                     </div>
                     <div>
@@ -375,6 +406,7 @@ const App: React.FC = () => {
   const [activeAssessmentId, setActiveAssessmentId] = useState<string | null>(null);
   const [config, setConfig] = useState<AssessmentConfig | null>(null);
   const [assessmentSearch, setAssessmentSearch] = useState('');
+  const [isEditingNew, setIsEditingNew] = useState(false);
   
   // Auth State
   const [currentUser, setCurrentUser] = useState<{ email: string, isAdmin: boolean } | null>(null);
@@ -397,6 +429,7 @@ const App: React.FC = () => {
   // Sync activeAssessmentId with active config
   useEffect(() => {
     if (activeAssessmentId) {
+        setIsEditingNew(false);
         const found = assessments.find(a => a.id === activeAssessmentId);
         setConfig(found || null);
     } else {
@@ -448,6 +481,7 @@ const App: React.FC = () => {
     setFinalResults(null);
     setConfig(null);
     setAssessmentSearch(''); // Clear search on logout
+    setIsEditingNew(false);
   };
 
   const handleCandidateAccess = () => {
@@ -555,13 +589,14 @@ const App: React.FC = () => {
   };
 
   const renderLanding = () => (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden text-slate-100 honeycomb-bg">
+    <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4 relative overflow-hidden text-slate-100 honeycomb-bg">
       <div className="absolute inset-0 bg-gradient-to-tr from-amber-900/10 to-slate-950 z-0 pointer-events-none"></div>
       
       <div className="z-10 w-full max-w-md space-y-8 bg-slate-900/80 backdrop-blur-xl p-8 border border-slate-800 rounded-2xl shadow-2xl">
         <div className="text-center space-y-4">
-          <div className="inline-flex p-4 rounded-2xl bg-slate-950 border border-slate-800 shadow-lg mb-2">
-             <BrainCircuit className="w-12 h-12 text-amber-500" />
+          <div className="inline-flex p-6 rounded-2xl bg-slate-950 border border-slate-800 shadow-lg mb-2 relative group">
+             <div className="absolute inset-0 bg-amber-500/20 blur-xl rounded-full opacity-50 group-hover:opacity-75 transition"></div>
+             <HiveLogo className="w-20 h-20 text-amber-500 relative z-10" />
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">PromptHive Validator</h1>
@@ -593,7 +628,7 @@ const App: React.FC = () => {
 
         {assessments.length > 0 && (
             <div className="mt-4 p-3 bg-slate-800/50 text-slate-500 text-xs rounded-lg border border-slate-700 text-center">
-                <span>{assessments.length} Active Protocols Detected</span>
+                <span>{assessments.length} Active Assessments Detected</span>
             </div>
         )}
       </div>
@@ -665,7 +700,7 @@ const App: React.FC = () => {
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
              <div className="border-b border-slate-800 pb-4">
                 <h2 className="text-2xl font-bold text-white">Performance Analytics</h2>
-                <p className="text-slate-400 mt-2">Aggregate metrics for assessment <strong className="text-amber-500">"{config.name}"</strong>.</p>
+                <p className="text-slate-400 mt-2">Aggregate metrics for <strong className="text-amber-500">"{config.name}"</strong>.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -715,368 +750,157 @@ const App: React.FC = () => {
     );
   };
 
-  const renderAdminLayout = () => {
-      const filteredAssessments = assessments.filter(a => 
-          a.name.toLowerCase().includes(assessmentSearch.toLowerCase())
-      );
+  const renderAdminDashboard = () => (
+    <div className="max-w-5xl mx-auto p-6 space-y-6 animate-fade-in">
+         <div className="flex items-center justify-between">
+            <div>
+                <h2 className="text-2xl font-bold text-white">Assessment Dashboard</h2>
+                <p className="text-slate-400 mt-1">Manage validation protocols and review results.</p>
+            </div>
+            <button 
+                onClick={() => { setActiveAssessmentId(null); setConfig(null); setIsEditingNew(true); }}
+                className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-lg transition"
+            >
+                <Plus className="w-5 h-5" /> New Assessment
+            </button>
+         </div>
 
-      return (
-          <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-slate-950">
-              {/* Sidebar */}
-              <aside className="w-64 bg-slate-900 border-r border-slate-800 flex-shrink-0 flex flex-col">
-                  <div className="p-6 border-b border-slate-800">
-                      <div className="flex flex-col items-center mb-6">
-                            <img 
-                                src="data:image/jpeg;base64,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" 
-                                alt="Admin Profile" 
-                                className="w-16 h-16 rounded-full border-2 border-amber-500 mb-3 object-cover shadow-lg shadow-amber-500/20"
-                            />
-                            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Admin Console</h3>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold">AD</div>
+         <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <input 
+                type="text" 
+                placeholder="Search assessments..." 
+                value={assessmentSearch}
+                onChange={e => setAssessmentSearch(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-white outline-none focus:border-amber-500 transition"
+            />
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {assessments
+                .filter(a => a.name.toLowerCase().includes(assessmentSearch.toLowerCase()))
+                .map(a => (
+                <div key={a.id} className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-amber-500/50 transition cursor-pointer group flex flex-col justify-between" onClick={() => setActiveAssessmentId(a.id)}>
+                    <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                            <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-amber-500/20 group-hover:text-amber-500 transition-colors text-slate-400">
+                                <Hexagon className="w-6 h-6" />
+                            </div>
+                            {a.candidates.some(c => c.status === 'COMPLETED') && (
+                                <span className="flex items-center gap-1 text-[10px] font-bold uppercase bg-green-900/30 text-green-400 px-2 py-1 rounded-full">
+                                    <Activity className="w-3 h-3" /> Active
+                                </span>
+                            )}
+                        </div>
                         <div>
-                            <div className="text-sm font-bold text-white">Admin User</div>
-                            <div className="text-xs text-slate-400">admin@prompthive.com</div>
-                        </div>
-                      </div>
-                  </div>
-
-                  {/* Assessment List */}
-                  <div className="flex-1 overflow-y-auto">
-                     <div className="p-4 space-y-2">
-                        <Tooltip content="Create a new assessment protocol" fullWidth>
-                            <button 
-                                onClick={() => {
-                                    setActiveAssessmentId(null);
-                                    setConfig(null);
-                                    setAdminTab('CONFIG');
-                                    setAssessmentSearch(''); // Clear search
-                                }}
-                                className={`w-full flex items-center gap-2 px-3 py-2 text-sm font-bold rounded border border-dashed transition ${!activeAssessmentId ? 'border-amber-500 text-amber-500 bg-amber-500/10' : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-200'}`}
-                            >
-                                <Plus className="w-4 h-4" /> New Assessment
-                            </button>
-                        </Tooltip>
-
-                        {/* Search Bar */}
-                        <div className="relative mb-2 group">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none" />
-                            <Tooltip content="Filter protocols by name" fullWidth>
-                                <input 
-                                    type="text" 
-                                    placeholder="Filter protocols..." 
-                                    value={assessmentSearch}
-                                    onChange={(e) => setAssessmentSearch(e.target.value)}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-md py-2 pl-8 pr-7 text-xs text-slate-300 placeholder:text-slate-600 focus:border-amber-500/50 outline-none transition"
-                                />
-                            </Tooltip>
-                            {assessmentSearch && (
-                                <button 
-                                    onClick={() => setAssessmentSearch('')}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white p-1"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="pt-2">
-                            <label className="text-[10px] font-bold text-slate-600 uppercase mb-2 block px-1">Your Protocols</label>
-                            {assessments.length === 0 ? (
-                                <p className="text-xs text-slate-600 px-1 italic">No assessments yet.</p>
-                            ) : filteredAssessments.length === 0 ? (
-                                <p className="text-xs text-slate-600 px-1 italic">No matches found.</p>
-                            ) : (
-                                filteredAssessments.map(a => (
-                                    <Tooltip key={a.id} content={a.name} position="right" fullWidth>
-                                        <button 
-                                            onClick={() => {
-                                                setActiveAssessmentId(a.id);
-                                                setAdminTab('CONFIG');
-                                            }}
-                                            className={`w-full text-left px-3 py-2 rounded text-sm mb-1 truncate transition ${activeAssessmentId === a.id ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'}`}
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <FolderOpen className="w-3 h-3 shrink-0" />
-                                                <span className="truncate">{a.name}</span>
-                                            </div>
-                                        </button>
-                                    </Tooltip>
-                                ))
-                            )}
-                        </div>
-                     </div>
-                  </div>
-                  
-                  {/* Contextual Tabs (Only if Assessment Selected) */}
-                  {config && (
-                    <div className="p-4 border-t border-slate-800 bg-slate-950/30">
-                        <label className="text-[10px] font-bold text-slate-600 uppercase mb-2 block px-1">Current Protocol</label>
-                        <nav className="space-y-1">
-                            <button 
-                                onClick={() => setAdminTab('CONFIG')}
-                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${adminTab === 'CONFIG' ? 'bg-slate-800 text-amber-500' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'}`}
-                            >
-                                <Settings className="w-4 h-4" /> Config
-                            </button>
-                            <button 
-                                onClick={() => setAdminTab('CANDIDATES')}
-                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${adminTab === 'CANDIDATES' ? 'bg-slate-800 text-amber-500' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'}`}
-                            >
-                                <Users className="w-4 h-4" /> Candidates
-                            </button>
-                            <button 
-                                onClick={() => setAdminTab('ANALYTICS')}
-                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${adminTab === 'ANALYTICS' ? 'bg-slate-800 text-amber-500' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'}`}
-                            >
-                                <BarChart3 className="w-4 h-4" /> Analytics
-                            </button>
-                        </nav>
-                    </div>
-                  )}
-
-                  <div className="p-4 border-t border-slate-800">
-                      <div className="bg-slate-950 p-3 rounded text-xs text-slate-500">
-                          v2.5.0 Multi-Tenant
-                      </div>
-                  </div>
-              </aside>
-
-              {/* Main Content */}
-              <main className="flex-1 overflow-y-auto bg-slate-950 p-8">
-                  {adminTab === 'CONFIG' && (
-                      <AdminPanel onSave={handleAdminSave} initialConfig={config} />
-                  )}
-                  {adminTab === 'CANDIDATES' && config ? renderCandidateList() : null}
-                  {adminTab === 'ANALYTICS' && config ? renderAnalytics() : null}
-                  
-                  {/* Empty state if tabs clicked without config */}
-                  {(!config && adminTab !== 'CONFIG') && (
-                       <div className="h-full flex flex-col items-center justify-center text-slate-500">
-                            <FolderOpen className="w-12 h-12 mb-4 opacity-20" />
-                            <p>Select an assessment from the sidebar to view details.</p>
-                       </div>
-                  )}
-              </main>
-          </div>
-      )
-  };
-
-  const renderResults = () => {
-    if (!finalResults || !config) return null;
-    const { score, answers } = finalResults;
-
-    // Calculate Averages for Summary
-    const passedAnswers = answers.filter(a => a.passed);
-    const avgAccuracy = passedAnswers.length ? Math.round(passedAnswers.reduce((acc, curr) => acc + (curr.metrics?.accuracy || 0), 0) / passedAnswers.length) : 0;
-    const avgTech = passedAnswers.length ? Math.round(passedAnswers.reduce((acc, curr) => acc + (curr.metrics?.promptEngineering || 0), 0) / passedAnswers.length) : 0;
-    const avgCreativity = passedAnswers.length ? Math.round(passedAnswers.reduce((acc, curr) => acc + (curr.metrics?.creativity || 0), 0) / passedAnswers.length) : 0;
-
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-24">
-        
-        {/* Report Header */}
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 shadow-sm">
-            <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="bg-amber-500 p-2 rounded-lg">
-                        <ShieldCheck className="w-6 h-6 text-black" />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold leading-none">Validation Report</h2>
-                        <span className="text-xs text-slate-500 uppercase tracking-wide">Candidate: {currentUser?.email || 'Guest'}</span>
-                    </div>
-                </div>
-                <div className="flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <div className="text-xs text-slate-500 uppercase font-semibold">Overall Grade</div>
-                        <div className={`text-xl font-bold ${score >= 70 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                            {score >= 70 ? 'PROFICIENT' : 'NEEDS IMPROVEMENT'}
+                            <h3 className="font-bold text-white truncate">{a.name}</h3>
+                            <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
+                                <Users className="w-3 h-3" /> {a.candidates.length} Candidates
+                            </p>
                         </div>
                     </div>
-                    <div className="w-12 h-12 rounded-full border-4 border-slate-100 dark:border-slate-800 flex items-center justify-center font-bold text-sm relative">
-                        {score}%
-                        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
-                            <path
-                                className={`${score >= 70 ? 'text-green-500' : 'text-red-500'}`}
-                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="3"
-                                strokeDasharray={`${score}, 100`}
-                            />
-                        </svg>
+                    <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center text-xs text-slate-500">
+                        <span>{new Date(a.validFrom).toLocaleDateString()}</span>
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-amber-500" />
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div className="max-w-5xl mx-auto p-6 space-y-8">
-            
-            {/* Executive Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-6 flex items-center gap-2">
-                        <Activity className="w-4 h-4" /> Skill Analysis
-                    </h3>
-                    <div className="flex flex-col sm:flex-row gap-8 items-center justify-center">
-                        <SpiderChart metrics={{ accuracy: avgAccuracy, promptEngineering: avgTech, creativity: avgCreativity }} />
-                        <div className="space-y-6 flex-1 w-full">
-                            <div>
-                                <div className="flex justify-between mb-1 text-sm font-medium">
-                                    <span>Visual Accuracy</span>
-                                    <span className="text-slate-500">{avgAccuracy}/100</span>
-                                </div>
-                                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                                    <div className="bg-amber-500 h-2 rounded-full" style={{ width: `${avgAccuracy}%` }}></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex justify-between mb-1 text-sm font-medium">
-                                    <span>Prompt Engineering</span>
-                                    <span className="text-slate-500">{avgTech}/100</span>
-                                </div>
-                                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                                    <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${avgTech}%` }}></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex justify-between mb-1 text-sm font-medium">
-                                    <span>Creativity & Logic</span>
-                                    <span className="text-slate-500">{avgCreativity}/100</span>
-                                </div>
-                                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                                    <div className="bg-pink-500 h-2 rounded-full" style={{ width: `${avgCreativity}%` }}></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-amber-500 rounded-2xl p-6 text-black flex flex-col justify-between shadow-lg shadow-amber-500/20 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                    <div>
-                        <h3 className="text-sm font-bold text-amber-900 uppercase tracking-wide mb-2">Recommendation</h3>
-                        <p className="text-2xl font-bold mb-4">
-                            {score >= 85 ? 'Highly Recommended' : score >= 70 ? 'Qualified' : 'Not Recommended'}
-                        </p>
-                        <p className="text-sm text-amber-950 opacity-90 leading-relaxed font-medium">
-                            {score >= 70 
-                             ? "Candidate demonstrates strong command of generative AI tools. Effective translation of visual requirements."
-                             : "Candidate shows potential gaps in prompt structure and visual analysis."}
-                        </p>
-                    </div>
-                    <div className="mt-6 pt-6 border-t border-amber-800/20 flex justify-between items-center">
-                        <div className="text-xs font-mono opacity-75">ID: {config.id.substring(0,8)}</div>
-                        <CheckCircle className="w-6 h-6 opacity-75" />
-                    </div>
-                </div>
-            </div>
-
-            {/* Metric Definitions with Scores */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Accuracy */}
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <div className="flex justify-between items-start mb-2">
-                         <h4 className="text-xs font-bold text-amber-600 dark:text-amber-500 uppercase">Visual Accuracy</h4>
-                         <span className="text-sm font-bold text-slate-900 dark:text-white">{avgAccuracy}/100</span>
-                    </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-3">
-                         <div className="bg-amber-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${avgAccuracy}%` }}></div>
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Evaluates fidelity to the target image's composition, color palette, lighting, and overall aesthetic style.
-                    </p>
-                </div>
-
-                {/* Engineering */}
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <div className="flex justify-between items-start mb-2">
-                         <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">Prompt Engineering</h4>
-                         <span className="text-sm font-bold text-slate-900 dark:text-white">{avgTech}/100</span>
-                    </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-3">
-                         <div className="bg-indigo-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${avgTech}%` }}></div>
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Assesses the technical structure, keyword usage, parameter application, and clarity of the written prompt.
-                    </p>
-                </div>
-
-                {/* Creativity */}
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <div className="flex justify-between items-start mb-2">
-                         <h4 className="text-xs font-bold text-pink-600 dark:text-pink-400 uppercase">Creativity & Logic</h4>
-                         <span className="text-sm font-bold text-slate-900 dark:text-white">{avgCreativity}/100</span>
-                    </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-3">
-                         <div className="bg-pink-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${avgCreativity}%` }}></div>
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Measures the ability to capture the core "vibe" and subject concept, even if specific details vary.
-                    </p>
-                </div>
-            </div>
-
-            {/* Detailed Breakdown */}
-            <div className="space-y-6">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-amber-500" /> Challenge Breakdown
-                </h3>
-                {config.questions.map((question, index) => {
-                    const answer = answers.find(a => a.questionId === question.id);
-                    return (
-                        <ResultCard 
-                            key={question.id} 
-                            question={question} 
-                            answer={answer} 
-                            index={index} 
-                        />
-                    );
-                })}
-            </div>
-
-            <div className="flex justify-center pt-8">
-                <button 
-                    onClick={() => {
-                        setView(AppView.LANDING);
-                        setAccessCodeInput('');
-                        setFinalResults(null);
-                        setCurrentUser(null);
-                    }}
-                    className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition font-medium shadow-sm"
-                >
-                    Return to Portal
-                </button>
-            </div>
-        </div>
-      </div>
-    );
-  };
+            ))}
+         </div>
+    </div>
+  );
 
   return (
-    <div className="bg-white dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-200 font-sans selection:bg-amber-500 selection:text-white flex flex-col">
-      <Navbar 
-        currentUser={currentUser} 
-        onLoginClick={() => setIsLoginModalOpen(true)}
-        onLogout={handleLogout}
-      />
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-500/30">
+        {renderLoginModal()}
+        
+        <Navbar 
+            currentUser={currentUser} 
+            onLoginClick={() => setIsLoginModalOpen(true)} 
+            onLogout={handleLogout} 
+        />
 
-      {renderLoginModal()}
-
-      <div className="flex-1">
         {view === AppView.LANDING && renderLanding()}
-        {view === AppView.ADMIN && renderAdminLayout()}
-        {view === AppView.ASSESSMENT && config && currentUser && (
+        
+        {view === AppView.ADMIN && (
+             <div className="min-h-[calc(100vh-64px)] bg-slate-950">
+                {!config && !isEditingNew ? renderAdminDashboard() : (
+                    <div className="max-w-7xl mx-auto p-6 flex flex-col gap-6">
+                        {/* Admin Nav Back */}
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                            <button onClick={() => { setActiveAssessmentId(null); setIsEditingNew(false); }} className="flex items-center gap-2 text-slate-400 hover:text-white transition text-sm">
+                                <ArrowRight className="w-4 h-4 rotate-180" /> Back to Dashboard
+                            </button>
+                            
+                            {!isEditingNew && (
+                                <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
+                                    <button 
+                                        onClick={() => setAdminTab('CONFIG')}
+                                        className={`px-4 py-1.5 rounded text-sm font-medium transition ${adminTab === 'CONFIG' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        Config
+                                    </button>
+                                    <button 
+                                        onClick={() => setAdminTab('CANDIDATES')}
+                                        className={`px-4 py-1.5 rounded text-sm font-medium transition ${adminTab === 'CANDIDATES' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        Candidates
+                                    </button>
+                                    <button 
+                                        onClick={() => setAdminTab('ANALYTICS')}
+                                        className={`px-4 py-1.5 rounded text-sm font-medium transition ${adminTab === 'ANALYTICS' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        Analytics
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Admin Content */}
+                        {adminTab === 'CONFIG' && (
+                            <AdminPanel 
+                                initialConfig={isEditingNew ? null : config} 
+                                onSave={handleAdminSave} 
+                            />
+                        )}
+                        {adminTab === 'CANDIDATES' && renderCandidateList()}
+                        {adminTab === 'ANALYTICS' && renderAnalytics()}
+                    </div>
+                )}
+             </div>
+        )}
+
+        {view === AppView.ASSESSMENT && config && (
             <VibeAssessment 
                 config={config} 
-                candidate={{ email: currentUser.email, accessCode: '', status: 'PENDING' }} 
-                onComplete={handleAssessmentComplete} 
+                candidate={config.candidates.find(c => c.email === currentUser?.email) || { email: 'unknown', accessCode: '', status: 'PENDING' }}
+                onComplete={handleAssessmentComplete}
             />
         )}
-        {view === AppView.RESULTS && renderResults()}
-      </div>
+
+        {view === AppView.RESULTS && finalResults && config && (
+             <div className="max-w-5xl mx-auto p-6 space-y-8 animate-fade-in">
+                <div className="text-center space-y-2 py-8">
+                    <div className="inline-flex p-4 rounded-full bg-slate-900 border border-slate-800 shadow-xl mb-4">
+                        <span className="text-4xl font-bold text-white">{finalResults.score}%</span>
+                    </div>
+                    <h1 className="text-3xl font-bold text-white">Assessment Complete</h1>
+                    <p className="text-slate-400">Here is your detailed breakdown for <strong className="text-amber-500">{config.name}</strong></p>
+                </div>
+                
+                <div className="space-y-6">
+                    {config.questions.map((q, i) => {
+                        const ans = finalResults.answers.find(a => a.questionId === q.id);
+                        return <ResultCard key={q.id} question={q} answer={ans} index={i} />;
+                    })}
+                </div>
+                
+                <div className="flex justify-center pt-8">
+                    <button onClick={handleLogout} className="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition font-medium">
+                        <LogOut className="w-4 h-4" /> Return to Home
+                    </button>
+                </div>
+             </div>
+        )}
     </div>
   );
 };

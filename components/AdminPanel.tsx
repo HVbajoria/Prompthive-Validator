@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Calendar, Clock, Loader2, Play, AlertTriangle, Settings, Users, BrainCircuit, ArrowRight, ArrowLeft, FileText, Sparkles, Sliders, Mail, MessageSquare, Plus, Trash2, Edit2, Check, Send, ChevronDown, Eye, X } from 'lucide-react';
 import { AssessmentConfig, Candidate, Question, DifficultyLevel, EmailTemplate } from '../types';
@@ -78,7 +77,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
         setQuestions(initialConfig.questions);
         setEmailText(initialConfig.candidates.map(c => c.email).join('\n'));
     } else {
-        setName('New Validation Protocol');
+        setName('New Assessment');
         setValidFrom(getLocalISOString(new Date()));
         setValidTo(getLocalISOString(new Date(Date.now() + 86400000)));
         setDuration(45);
@@ -407,7 +406,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
       {/* Header */}
       <div className="border-b border-slate-800 pb-4 mb-6 flex items-start justify-between">
         <div>
-            <h2 className="text-2xl font-bold text-white">{initialConfig ? 'Edit Assessment' : 'New Assessment Protocol'}</h2>
+            <h2 className="text-2xl font-bold text-white">{initialConfig ? 'Edit Assessment' : 'New Assessment'}</h2>
             <p className="text-slate-400 mt-2">Configure validation parameters and generate target vectors.</p>
         </div>
         <Tooltip content="Simulate assessment as a candidate">
@@ -478,7 +477,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
                     </h3>
                     
                     <div>
-                        <label className="block text-sm text-slate-400 mb-1">Protocol Name</label>
+                        <label className="block text-sm text-slate-400 mb-1">Assessment Name</label>
                         <Tooltip content="A descriptive title for this assessment visible to candidates" fullWidth>
                             <input 
                             type="text" 
@@ -969,13 +968,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
                                             <div>
                                                 <label className="text-[10px] text-slate-500 uppercase font-bold block mb-1">Subject</label>
                                                 <div className="text-sm text-white font-medium border-b border-slate-800 pb-2">
-                                                    {parseEmail(templates.find(t => t.id === activeTemplateId)!, { email: 'candidate@example.com', accessCode: 'A1B2C3D4', status: 'PENDING' }, { name: name || 'Protocol Name', durationMinutes: duration } as any).subject}
+                                                    {parseEmail(templates.find(t => t.id === activeTemplateId)!, { email: 'candidate@example.com', accessCode: 'A1B2C3D4', status: 'PENDING' }, { name: name || 'Assessment Name', durationMinutes: duration } as any).subject}
                                                 </div>
                                             </div>
                                             <div>
                                                 <label className="text-[10px] text-slate-500 uppercase font-bold block mb-1">Body</label>
                                                 <div className="text-sm text-slate-300 whitespace-pre-wrap font-mono bg-slate-950 p-4 rounded border border-slate-800">
-                                                    {parseEmail(templates.find(t => t.id === activeTemplateId)!, { email: 'candidate@example.com', accessCode: 'A1B2C3D4', status: 'PENDING' }, { name: name || 'Protocol Name', durationMinutes: duration } as any).body}
+                                                    {parseEmail(templates.find(t => t.id === activeTemplateId)!, { email: 'candidate@example.com', accessCode: 'A1B2C3D4', status: 'PENDING' }, { name: name || 'Assessment Name', durationMinutes: duration } as any).body}
                                                 </div>
                                             </div>
                                         </div>

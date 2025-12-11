@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { AssessmentConfig, AssessmentState, Candidate, Question, AssessmentAnswer, ValidationResult } from '../types';
 import { generateImage, evaluateSimilarity } from '../services/geminiService';
@@ -74,8 +73,8 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
     // Create a failed answer for the skipped question
     const skippedAnswer: AssessmentAnswer = {
         questionId: currentQ.id,
-        userPrompt: "PROTOCOL_OVERRIDE // SKIPPED",
-        generatedImageUrl: "", 
+        userPrompt: "ASSESSMENT_OVERRIDE // SKIPPED",
+        generatedImageUrl: "skipped", 
         similarityScore: 0,
         metrics: { accuracy: 0, promptEngineering: 0, creativity: 0 },
         passed: false,
@@ -87,7 +86,7 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
     const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
     setHistory(prev => [{
         timestamp,
-        prompt: "PROTOCOL SKIPPED",
+        prompt: "SKIPPED BY USER",
         status: 'SKIPPED',
         level: state.currentQuestionIndex + 1
     }, ...prev]);
@@ -124,6 +123,7 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
     setState(prev => ({ ...prev, isGenerating: true, error: null }));
     setLastEvaluation(null);
     setLastAttemptImage(null); 
+    setViewMode('GENERATED'); // Switch to view generated image when it arrives
 
     try {
       const currentQ = config.questions[state.currentQuestionIndex];
@@ -318,202 +318,181 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
                             <img src={lastAttemptImage} alt="Attempt" className="w-full h-full object-contain" />
                         )}
                         {viewMode === 'DIFF' && lastAttemptImage && (
-                            <div className="relative w-full h-full">
-                                <img src={lastAttemptImage} className="absolute inset-0 w-full h-full object-contain" alt="Base" />
+                             <div className="w-full h-full relative">
+                                <img src={lastAttemptImage} className="absolute inset-0 w-full h-full object-contain" alt="Gen" />
                                 <img 
                                     src={currentQuestion.targetImageUrl} 
-                                    className="absolute inset-0 w-full h-full object-contain"
-                                    style={{ 
-                                        mixBlendMode: 'difference',
-                                        animation: 'difference-pulse 2s ease-in-out infinite'
-                                    }}
-                                    alt="Diff" 
+                                    className="absolute inset-0 w-full h-full object-contain" 
+                                    style={{ mixBlendMode: 'difference', animation: 'difference-pulse 2s infinite' }}
+                                    alt="Target" 
                                 />
-                                <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-                                    <span className="bg-black/80 text-red-400 px-4 py-2 rounded-full text-xs font-bold border border-red-500/30 backdrop-blur-md">
-                                        Scan Active: Mismatches Highlighted
-                                    </span>
-                                </div>
-                            </div>
+                             </div>
                         )}
+                         {!lastAttemptImage && viewMode !== 'TARGET' && (
+                             <div className="text-zinc-600 flex flex-col items-center">
+                                 <AlertOctagon className="w-12 h-12 mb-2 opacity-50" />
+                                 <p>No image generated yet</p>
+                             </div>
+                         )}
                     </div>
 
-                    {/* Overlay Controls */}
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md rounded-full p-1 flex gap-1 border border-white/10 shadow-lg">
-                        <Tooltip content="Show goal image">
+                    {/* Image Controls */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur border border-zinc-700 rounded-full p-1 flex gap-1 z-10 shadow-lg">
+                        <Tooltip content="Show Target">
                             <button 
                                 onClick={() => setViewMode('TARGET')}
-                                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'TARGET' ? 'bg-white text-black shadow-sm' : 'text-zinc-400 hover:text-white'}`}
+                                className={`p-2 rounded-full transition ${viewMode === 'TARGET' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}
                             >
-                                Target
+                                <Eye className="w-4 h-4" />
                             </button>
                         </Tooltip>
-                        <Tooltip content="Show your generated result">
+                        <Tooltip content="Show Generated">
                             <button 
-                                onClick={() => lastAttemptImage && setViewMode('GENERATED')}
+                                onClick={() => setViewMode('GENERATED')}
                                 disabled={!lastAttemptImage}
-                                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'GENERATED' ? 'bg-white text-black shadow-sm' : 'text-zinc-400 hover:text-white disabled:opacity-30'}`}
+                                className={`p-2 rounded-full transition ${viewMode === 'GENERATED' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white disabled:opacity-30'}`}
                             >
-                                Attempt
+                                <ImageIcon className="w-4 h-4" />
                             </button>
                         </Tooltip>
-                        <Tooltip content="Highlight pixel differences">
+                        <Tooltip content="Show Difference">
                             <button 
-                                onClick={() => lastAttemptImage && setViewMode('DIFF')}
+                                onClick={() => setViewMode('DIFF')}
                                 disabled={!lastAttemptImage}
-                                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${viewMode === 'DIFF' ? 'bg-red-500 text-white shadow-sm' : 'text-zinc-400 hover:text-white disabled:opacity-30'}`}
+                                className={`p-2 rounded-full transition ${viewMode === 'DIFF' ? 'bg-zinc-700 text-red-400' : 'text-zinc-400 hover:text-white disabled:opacity-30'}`}
                             >
-                                Diff
+                                <Layers className="w-4 h-4" />
                             </button>
                         </Tooltip>
                     </div>
-                </div>
-            </div>
 
-            {/* Context Hint */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 flex items-start gap-3 text-sm text-zinc-400">
-                <Info className="w-5 h-5 text-indigo-400 shrink-0" />
-                <p>
-                    <span className="text-zinc-200 font-semibold block mb-1">Analyst Note</span>
-                    This challenge is rated <span className="text-amber-500 font-bold">{currentQuestion.difficulty}</span>. 
-                    You must achieve a match score of <span className="text-amber-500 font-bold">{currentQuestion.passingThreshold}%</span> to proceed.
-                </p>
+                    {/* Success Overlay */}
+                    {isSuccess && (
+                        <div className="absolute inset-0 bg-green-900/20 backdrop-blur-sm flex items-center justify-center animate-fade-in z-20">
+                            <div className="bg-green-500 text-white p-6 rounded-full shadow-2xl transform scale-125">
+                                <CheckCircle className="w-16 h-16" />
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
 
-        {/* Right: Interaction (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col h-full gap-4">
+        {/* Right: Controls (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col gap-4 h-[500px] lg:h-[600px]">
             
-            {/* Feedback Status */}
-            {lastEvaluation && !lastEvaluation.passed && (
-                <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 animate-fade-in flex flex-col gap-3">
-                    <div className="flex gap-3">
-                        <AlertOctagon className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                            <strong className="block text-red-400 mb-1">Alignment Failure</strong>
-                            <p className="text-red-200/80 leading-relaxed text-xs">{lastEvaluation.feedback}</p>
-                        </div>
-                    </div>
-                    
-                    {/* Granular Metrics */}
-                    <div className="grid grid-cols-3 gap-2 mt-1">
-                         <div className="bg-black/20 rounded p-2 border border-red-500/10">
-                            <div className="text-[10px] uppercase text-zinc-500 font-bold mb-1">Visuals</div>
-                            <div className={`text-sm font-mono font-bold ${lastEvaluation.metrics.accuracy < 70 ? 'text-red-400' : 'text-green-400'}`}>
-                                {lastEvaluation.metrics.accuracy}
-                            </div>
-                         </div>
-                         <div className="bg-black/20 rounded p-2 border border-red-500/10">
-                            <div className="text-[10px] uppercase text-zinc-500 font-bold mb-1">Syntax</div>
-                            <div className={`text-sm font-mono font-bold ${lastEvaluation.metrics.promptEngineering < 70 ? 'text-red-400' : 'text-green-400'}`}>
-                                {lastEvaluation.metrics.promptEngineering}
-                            </div>
-                         </div>
-                         <div className="bg-black/20 rounded p-2 border border-red-500/10">
-                            <div className="text-[10px] uppercase text-zinc-500 font-bold mb-1">Concept</div>
-                            <div className={`text-sm font-mono font-bold ${lastEvaluation.metrics.creativity < 70 ? 'text-red-400' : 'text-green-400'}`}>
-                                {lastEvaluation.metrics.creativity}
-                            </div>
-                         </div>
+            {/* Level Info */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex justify-between items-center">
+                <div>
+                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Current Level</h3>
+                    <div className="text-xl font-bold text-white flex items-center gap-2">
+                        Level {state.currentQuestionIndex + 1}
+                        <span className="text-sm font-normal text-zinc-600">/ {config.questions.length}</span>
                     </div>
                 </div>
-            )}
-
-            {/* Code Editor / Input */}
-            <div className={`flex-1 bg-zinc-900 border rounded-2xl flex flex-col shadow-inner transition-colors duration-300 overflow-hidden ${isSuccess ? 'border-green-500/50 ring-1 ring-green-500/20' : 'border-zinc-800'}`}>
-                <div className="bg-zinc-950 border-b border-zinc-800 p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono">
-                        <Terminal className="w-4 h-4" />
-                        <span>prompt_entry.txt</span>
-                    </div>
-                    {skipsUsed < MAX_SKIPS && (
-                        <Tooltip content="Skip this challenge (Limited use!)" position="left">
-                            <button 
-                                onClick={handleSkip}
-                                disabled={state.isGenerating || isSuccess}
-                                className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1 transition"
-                            >
-                                Skip Level <SkipForward className="w-3 h-3" />
-                            </button>
-                        </Tooltip>
-                    )}
+                <div className="text-right">
+                     <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Difficulty</h3>
+                     <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                         currentQuestion.difficulty === 'EXPERT' ? 'bg-purple-900/30 text-purple-400' : 
+                         currentQuestion.difficulty === 'HARD' ? 'bg-red-900/30 text-red-400' : 
+                         'bg-amber-900/30 text-amber-400'
+                     }`}>
+                         {currentQuestion.difficulty}
+                     </span>
                 </div>
-                
-                <Tooltip content="Type a prompt to recreate the target image" fullWidth className="flex-1">
-                    <textarea 
-                        value={promptInput}
-                        onChange={(e) => setPromptInput(e.target.value)}
-                        disabled={state.isGenerating || isSuccess}
-                        placeholder="// Enter your prompt generation sequence here..."
-                        className="flex-1 w-full bg-zinc-900 p-4 text-zinc-100 font-mono text-sm outline-none resize-none placeholder:text-zinc-700"
-                        spellCheck={false}
-                        onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            if (!state.isGenerating && promptInput) handleGenerateAndCheck();
-                        }
-                        }}
-                    />
-                </Tooltip>
-                
-                <div className="p-4 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between">
-                     <div className="text-xs text-zinc-500 font-mono">
-                        {state.isGenerating ? (
-                            <span className="flex items-center gap-2 text-indigo-400">
-                                <RefreshCw className="w-3 h-3 animate-spin" /> Processing...
-                            </span>
-                        ) : (
-                            <span>Ready to execute</span>
-                        )}
-                     </div>
+            </div>
 
-                     <Tooltip content="Submit prompt to AI Judge" position="left">
+            {/* Prompt Input */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-1 flex-1 flex flex-col relative group focus-within:border-indigo-500/50 transition-colors">
+                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-500 opacity-0 group-focus-within:opacity-100 transition-opacity rounded-t-xl"></div>
+                 <textarea 
+                    value={promptInput}
+                    onChange={(e) => setPromptInput(e.target.value)}
+                    disabled={state.isGenerating || isSuccess}
+                    placeholder="Describe the image to reverse-engineer it..."
+                    className="w-full h-full bg-zinc-950/50 rounded-lg p-4 text-zinc-200 placeholder:text-zinc-600 resize-none outline-none font-mono text-sm leading-relaxed"
+                 />
+                 
+                 {/* Action Bar */}
+                 <div className="p-3 flex justify-between items-center border-t border-zinc-800">
+                     <Tooltip content="Skip to next level (Penalty applied)">
                         <button 
-                            onClick={handleGenerateAndCheck}
-                            disabled={state.isGenerating || !promptInput || isSuccess}
-                            className={`px-6 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
-                                ${isSuccess 
-                                    ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/20' 
-                                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'}`}
+                            onClick={handleSkip}
+                            disabled={state.isGenerating || skipsUsed >= MAX_SKIPS}
+                            className="text-zinc-500 hover:text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 text-xs font-medium px-2 py-1 rounded hover:bg-zinc-800 transition"
                         >
-                            {isSuccess ? (
-                                <> <CheckCircle className="w-4 h-4" /> Success </>
-                            ) : (
-                                <> <Send className="w-4 h-4" /> Run Protocol </>
-                            )}
+                            <SkipForward className="w-3 h-3" /> Skip ({skipsUsed}/{MAX_SKIPS})
                         </button>
                      </Tooltip>
-                </div>
+
+                     <button 
+                        onClick={handleGenerateAndCheck}
+                        disabled={state.isGenerating || !promptInput.trim() || isSuccess}
+                        className={`
+                            relative overflow-hidden px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg transition-all transform active:scale-95 flex items-center gap-2
+                            ${!promptInput.trim() ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20'}
+                        `}
+                     >
+                        {state.isGenerating ? (
+                            <> <Loader2 className="animate-spin w-4 h-4" /> Processing </>
+                        ) : (
+                            <> <Send className="w-4 h-4" /> Submit Prompt </>
+                        )}
+                     </button>
+                 </div>
             </div>
 
-            {/* History Feed */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden flex flex-col max-h-48">
-                <div className="bg-zinc-950 p-3 text-xs font-semibold text-zinc-400 border-b border-zinc-800 flex items-center gap-2">
-                    <History className="w-3 h-3" /> Execution Log
-                </div>
-                <div className="overflow-y-auto p-2 space-y-1">
-                    {history.length === 0 && (
-                        <div className="text-center text-zinc-600 text-xs py-4 italic">No commands executed yet.</div>
-                    )}
-                    {history.map((entry, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-2 rounded hover:bg-zinc-800/50 transition text-xs font-mono border-b border-zinc-800/50 last:border-0">
-                            <span className="text-zinc-600 shrink-0">{entry.timestamp}</span>
-                            <span className={`shrink-0 font-bold ${
-                                entry.status === 'SUCCESS' ? 'text-green-400' : 
-                                entry.status === 'SKIPPED' ? 'text-zinc-400' : 'text-red-400'
-                            }`}>
-                                {entry.status}
-                            </span>
-                            <Tooltip content={entry.prompt} position="top" className="flex-1 min-w-0">
-                                <span className="text-zinc-400 truncate w-full block">{entry.prompt}</span>
-                            </Tooltip>
+            {/* Console / Feedback */}
+            <div className="bg-black border border-zinc-800 rounded-xl p-4 h-48 overflow-y-auto font-mono text-xs shadow-inner">
+                {lastEvaluation ? (
+                    <div className="space-y-3 animate-fade-in">
+                        <div className={`flex items-center gap-2 font-bold ${lastEvaluation.passed ? 'text-green-400' : 'text-red-400'}`}>
+                            {lastEvaluation.passed ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                            <span>{lastEvaluation.passed ? 'TARGET ACQUIRED' : 'MISMATCH DETECTED'}</span>
+                            <span className="ml-auto opacity-75">{lastEvaluation.score}% Match</span>
                         </div>
-                    ))}
-                </div>
+                        <p className="text-zinc-300 leading-relaxed border-l-2 border-zinc-700 pl-2">
+                            {lastEvaluation.feedback}
+                        </p>
+                        <div className="grid grid-cols-3 gap-2 mt-2">
+                            <div className="bg-zinc-900 p-2 rounded text-center">
+                                <div className="text-zinc-500 text-[10px] uppercase">Accuracy</div>
+                                <div className="text-zinc-200 font-bold">{lastEvaluation.metrics.accuracy}</div>
+                            </div>
+                            <div className="bg-zinc-900 p-2 rounded text-center">
+                                <div className="text-zinc-500 text-[10px] uppercase">Tech</div>
+                                <div className="text-zinc-200 font-bold">{lastEvaluation.metrics.promptEngineering}</div>
+                            </div>
+                            <div className="bg-zinc-900 p-2 rounded text-center">
+                                <div className="text-zinc-500 text-[10px] uppercase">Vibe</div>
+                                <div className="text-zinc-200 font-bold">{lastEvaluation.metrics.creativity}</div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-1">
+                        <div className="text-zinc-500 mb-2">// System Log</div>
+                        {history.map((entry, i) => (
+                            <div key={i} className="flex gap-2 opacity-70 hover:opacity-100 transition-opacity">
+                                <span className="text-zinc-600">[{entry.timestamp}]</span>
+                                <span className={
+                                    entry.status === 'SUCCESS' ? 'text-green-500' : 
+                                    entry.status === 'SKIPPED' ? 'text-amber-500' :
+                                    'text-red-500'
+                                }>
+                                    {entry.status}
+                                </span>
+                                <span className="text-zinc-400 truncate max-w-[150px]">L{entry.level}: {entry.prompt}</span>
+                            </div>
+                        ))}
+                        {history.length === 0 && (
+                            <div className="text-zinc-700 italic">Waiting for input...</div>
+                        )}
+                    </div>
+                )}
             </div>
 
         </div>
-
       </main>
     </div>
   );
