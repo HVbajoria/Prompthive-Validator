@@ -187,15 +187,105 @@ Gemini 3.0 Pro Preview's evaluation leverages its breakthrough capabilities:
 - Structured JSON output with explainable decisions
 - Unified model for both assessment creation and evaluation
 
-### User Experience Flow
+### Complete System Flow
 
+```mermaid
+flowchart TD
+    A[Admin Creates Assessment] --> B[Gemini 3.0 Pro Preview<br/>Generates Challenges]
+    B --> C[Candidates Receive Access Codes]
+    C --> D[Real-time Prompt Challenge]
+    D --> E[AI Evaluation Engine<br/>Four-Input Analysis]
+    E --> F[Detailed Analytics Dashboard]
+    F --> G[Hiring Decision Support]
+    
+    style B fill:#f59e0b,stroke:#333,stroke-width:3px
+    style E fill:#f59e0b,stroke:#333,stroke-width:3px
 ```
-Admin Creates Assessment → AI Generates Target Images → Candidates Receive Access Codes
-         ↓
-Real-time Prompt Challenge → AI Evaluation Engine → Detailed Analytics Dashboard
-         ↓
-Hiring Decision Support
+
+---
+
+## 🔬 Methodology: Feature Logic & AI Capabilities
+
+### Admin Workflow: Assessment Creation & Management
+
+```mermaid
+flowchart TD
+    A[Admin Login] --> B[Create Assessment]
+    B --> C[Set Difficulty & Instructions]
+    C --> D[Gemini 3.0 Pro Preview<br/>Generates Creative Prompts]
+    D --> E[AI Creates Target Images]
+    E --> F[Store Assessment Challenges]
+    F --> G[Configure Candidate List]
+    G --> H[Generate Access Codes]
+    H --> I[Send Invitations]
+    I --> J[Monitor Real-Time Analytics]
+    
+    style D fill:#f59e0b,stroke:#333,stroke-width:3px
+    style E fill:#f59e0b,stroke:#333,stroke-width:3px
 ```
+
+**Key AI Capabilities:**
+- **Challenge Generation**: Gemini 3.0 Pro Preview uses advanced reasoning to create contextually appropriate prompts based on difficulty constraints
+- **Target Image Creation**: Multimodal generation ensures consistent visual targets for assessment
+- **Analytics Processing**: Structured output enables real-time performance insights and hiring decision support
+
+### Candidate Workflow: Assessment Experience & Evaluation
+
+```mermaid
+flowchart TD
+    A[Candidate Access Code] --> B[View Target Image]
+    B --> C[Analyze Visual Elements]
+    C --> D[Craft Reverse-Engineered Prompt]
+    D --> E[Gemini 3.0 Pro Preview<br/>Generates Candidate Image]
+    E --> F[Four-Input AI Evaluation]
+    F --> G[Visual Accuracy Score]
+    F --> H[Prompt Engineering Score]
+    F --> I[Creative Interpretation Score]
+    G --> J[Spider Chart Analytics]
+    H --> J
+    I --> J
+    J --> K[Detailed Feedback & Results]
+    K --> L[Visualization Tools<br/>Diff/Overlay/Side-by-Side]
+    
+    style E fill:#f59e0b,stroke:#333,stroke-width:3px
+    style F fill:#f59e0b,stroke:#333,stroke-width:3px
+```
+
+**Key AI Capabilities:**
+- **Real-Time Generation**: Gemini 3.0 Pro Preview creates candidate images from natural language prompts
+- **Multimodal Evaluation**: 2M token context processes visual and textual data simultaneously
+- **Meta-Cognitive Assessment**: AI judges AI-generated content with human-level discernment
+
+### Core AI Evaluation Engine: Four-Input Analysis
+
+```mermaid
+flowchart LR
+    A[Target Image] --> E[Gemini 3.0 Pro Preview<br/>2M Token Context]
+    B[Generated Image] --> E
+    C[Hidden Original Prompt] --> E
+    D[Candidate Prompt] --> E
+    
+    E --> F[Visual Analysis<br/>Composition & Style]
+    E --> G[Semantic Mapping<br/>Linguistic Precision]
+    E --> H[Technical Assessment<br/>Prompt Engineering]
+    
+    F --> I[Structured JSON Output]
+    G --> I
+    H --> I
+    
+    I --> J[Visual Accuracy 0-100]
+    I --> K[Prompt Technique 0-100]
+    I --> L[Creative Interpretation 0-100]
+    I --> M[Detailed Reasoning Chain]
+    
+    style E fill:#f59e0b,stroke:#333,stroke-width:4px
+    style I fill:#06b6d4,stroke:#333,stroke-width:2px
+```
+
+**Revolutionary AI Methodology:**
+- **Self-Referential Loop**: First platform where AI generates content, human provides input, and AI judges the relationship objectively
+- **Context-Aware Understanding**: Native comprehension of artistic styles, cultural references, and creative "vibe"
+- **Explainable Decisions**: Structured intelligence output with detailed reasoning chains for transparent feedback
 
 ---
 
