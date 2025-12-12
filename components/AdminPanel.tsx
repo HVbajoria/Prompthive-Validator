@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Calendar, Clock, Loader2, Play, AlertTriangle, Settings, Users, BrainCircuit, ArrowRight, ArrowLeft, FileText, Sparkles, Sliders, Mail, MessageSquare, Plus, Trash2, Edit2, Check, Send, ChevronDown, Eye, X } from 'lucide-react';
+import { Upload, Calendar, Clock, Loader2, Play, AlertTriangle, Settings, Users, BrainCircuit, ArrowRight, ArrowLeft, FileText, Sparkles, Sliders, Mail, MessageSquare, Plus, Trash2, Edit2, Check, Send, ChevronDown, Eye, X, ShieldCheck } from 'lucide-react';
 import { AssessmentConfig, Candidate, Question, DifficultyLevel, EmailTemplate } from '../types';
 import { generateRandomPromptQuestion } from '../services/geminiService';
 import { saveTemplateToDB, deleteTemplateFromDB, getAllTemplatesFromDB } from '../services/storage';
-import { DEFAULT_TEMPLATE, parseEmail, openMailClient, sendEmailViaService } from '../services/emailService';
+import { DEFAULT_TEMPLATE, parseEmail, openMailClient } from '../services/emailService';
 import Tooltip from './Tooltip';
 import VibeAssessment from './VibeAssessment';
 
@@ -61,8 +61,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
   const [activeTemplateId, setActiveTemplateId] = useState<string>('default');
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
 
-  // Preview State
+  // Preview & Confirm State
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isConfirmDeployOpen, setIsConfirmDeployOpen] = useState(false);
 
   const errorRef = useRef<HTMLDivElement>(null);
 
@@ -207,10 +208,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
         });
       }
       setQuestions(prev => [...prev, ...newQuestions]);
-      setSuccessMsg(`✨ Generated ${newQuestions.length} new challenge(s) successfully!`);
     } catch (e) {
       console.error(e);
-      setErrorMsg("❌ Failed to generate assets. Ensure API Key is set and valid.");
+      setErrorMsg("Failed to generate assets. Ensure API Key is set and valid.");
     } finally {
       setIsGenerating(false);
     }
@@ -242,33 +242,42 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
     setIsPreviewMode(true);
   };
 
-  const handleSaveConfig = () => {
+  const validateConfig = (): boolean => {
     setErrorMsg(null);
     
     // 1. Validate Details
     if (!name.trim()) {
         setActiveTab('DETAILS');
         setErrorMsg("Assessment Name is required.");
-        return;
+        return false;
     }
     if (!validFrom || !validTo) {
         setActiveTab('DETAILS');
         setErrorMsg("Start and End dates are required.");
-        return;
+        return false;
     }
     // 2. Validate Candidates
     if (candidates.length === 0) {
         setActiveTab('CANDIDATES');
         setErrorMsg("At least one valid candidate email must be added.");
-        return;
+        return false;
     }
     // 3. Validate Questions
     if (questions.length === 0) {
         setActiveTab('CHALLENGES');
         setErrorMsg("At least one challenge question must be generated.");
-        return;
+        return false;
     }
+    return true;
+  };
 
+  const handleDeployClick = () => {
+    if (validateConfig()) {
+        setIsConfirmDeployOpen(true);
+    }
+  };
+
+  const handleSaveConfig = () => {
     try {
         const config: AssessmentConfig = {
           id: initialConfig?.id || generateId(),
@@ -280,10 +289,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
           questions
         };
         onSave(config);
-        setSuccessMsg(`🚀 Assessment "${name}" deployed successfully!`);
+        setIsConfirmDeployOpen(false);
     } catch (err) {
         console.error("Save error:", err);
-        setErrorMsg("❌ Failed to save configuration. Please try again.");
+        setErrorMsg("Failed to save configuration. Please try again.");
     }
   };
 
@@ -320,7 +329,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
       }
   };
 
-  const handleSendEmail = async (candidate: Candidate) => {
+  const handleSendEmail = (candidate: Candidate) => {
       try {
           const template = templates.find(t => t.id === activeTemplateId) || DEFAULT_TEMPLATE;
           
@@ -336,20 +345,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
           };
     
           const { subject, body } = parseEmail(template, candidate, currentConfigStub);
-          
-          // Try EmailJS first, fallback to mailto
-          const emailSent = await sendEmailViaService(candidate.email, subject, body);
-          
-          if (emailSent) {
-              setSuccessMsg(`✅ Email sent successfully to ${candidate.email}`);
-          } else {
-              // Fallback to mail client
-              openMailClient(candidate.email, subject, body);
-              setSuccessMsg(`📧 Opening mail client for ${candidate.email}...`);
-          }
+          openMailClient(candidate.email, subject, body);
+          setSuccessMsg(`Opening mail client for ${candidate.email}...`);
       } catch (e) {
           console.error(e);
-          setErrorMsg("❌ Failed to send email. Please try again.");
+          setErrorMsg("Failed to open email client.");
       }
   };
 
@@ -411,6 +411,52 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
         <div className="fixed top-4 right-4 z-[70] bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce-in">
             <Check className="w-5 h-5" />
             <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Deployment Confirmation Modal */}
+      {isConfirmDeployOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl max-w-md w-full shadow-2xl space-y-4 relative">
+                <div className="flex items-center gap-3 text-amber-500 mb-2">
+                    <ShieldCheck className="w-8 h-8" />
+                    <h3 className="text-xl font-bold text-white">Confirm Deployment</h3>
+                </div>
+                <p className="text-slate-300">
+                    You are about to deploy <strong>{name}</strong>.
+                </p>
+                <div className="bg-slate-950 p-4 rounded border border-slate-800 text-sm space-y-2">
+                   <div className="flex justify-between">
+                       <span className="text-slate-500">Candidates:</span>
+                       <span className="text-white font-mono">{candidates.length}</span>
+                   </div>
+                   <div className="flex justify-between">
+                       <span className="text-slate-500">Challenges:</span>
+                       <span className="text-white font-mono">{questions.length}</span>
+                   </div>
+                   <div className="flex justify-between">
+                       <span className="text-slate-500">Duration:</span>
+                       <span className="text-white font-mono">{duration} mins</span>
+                   </div>
+                </div>
+                <p className="text-xs text-slate-500">
+                    Once deployed, candidates with valid emails will be able to access the assessment using their generated codes.
+                </p>
+                <div className="flex gap-3 pt-2">
+                    <button 
+                        onClick={() => setIsConfirmDeployOpen(false)}
+                        className="flex-1 px-4 py-2 border border-slate-700 hover:bg-slate-800 text-slate-300 rounded-lg transition"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={handleSaveConfig}
+                        className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition shadow-lg shadow-indigo-500/20"
+                    >
+                        Confirm & Deploy
+                    </button>
+                </div>
+            </div>
         </div>
       )}
 
@@ -1012,7 +1058,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
                     </button>
                     <Tooltip content="Save and activate this assessment">
                         <button 
-                            onClick={handleSaveConfig}
+                            onClick={handleDeployClick}
                             disabled={isGenerating}
                             className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >

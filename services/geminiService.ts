@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ValidationResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: 'AIzaSyAOliyZVRRuD5jBD8gAx_PnIUexDS-vujM' });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
  * Generates an image based on a prompt.

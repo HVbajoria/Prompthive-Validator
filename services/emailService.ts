@@ -1,16 +1,11 @@
 
 import { EmailTemplate, Candidate, AssessmentConfig } from '../types';
 
-// EmailJS Configuration
-const EMAILJS_SERVICE_ID = 'service_12xh1zd';
-const EMAILJS_TEMPLATE_ID = 'template_8t3gfmk';
-const EMAILJS_PUBLIC_KEY = 'aNI_4oH5jbOPs2GQb'; // Replace with actual key
-
 export const DEFAULT_TEMPLATE: EmailTemplate = {
     id: 'default',
     name: 'Standard Invitation',
     subject: 'Action Required: Assessment Invitation for {assessmentName}',
-    body: `Hello {name},
+    body: `Hello,
 
 You have been invited to complete the following assessment: {assessmentName}.
 
@@ -22,7 +17,7 @@ Time Limit: {duration} minutes.
 Link: {link}
 
 Good luck,
-The PromptHive Team`,
+The Team`,
     isDefault: true
 };
 
@@ -55,49 +50,6 @@ export const parseEmail = (
 };
 
 /**
- * Load EmailJS dynamically
- */
-const loadEmailJS = (): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        if (window.emailjs) {
-            resolve(window.emailjs);
-            return;
-        }
-        
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        script.onload = () => {
-            window.emailjs.init(EMAILJS_PUBLIC_KEY);
-            resolve(window.emailjs);
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-    });
-};
-
-/**
- * Send email using EmailJS service
- */
-export const sendEmailViaService = async (to: string, subject: string, body: string): Promise<boolean> => {
-    try {
-        const emailjs = await loadEmailJS();
-        
-        const templateParams = {
-            to_email: to,
-            subject: subject,
-            message: body,
-            from_name: 'PromptHive Validator'
-        };
-
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-        return true;
-    } catch (error) {
-        console.error('EmailJS Error:', error);
-        return false;
-    }
-};
-
-/**
  * Triggers the user's default email client with the pre-filled content.
  * Uses a hidden anchor tag to ensure better compatibility than window.location.href.
  */
@@ -125,10 +77,3 @@ export const openMailClient = (to: string, subject: string, body: string) => {
         document.body.removeChild(link);
     }
 };
-
-// Declare emailjs for TypeScript
-declare global {
-    interface Window {
-        emailjs: any;
-    }
-}

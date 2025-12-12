@@ -17,9 +17,10 @@ interface HistoryEntry {
     level: number;
 }
 
-const MAX_SKIPS = 1;
-
 const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onComplete }) => {
+  // Config
+  const MAX_SKIPS = config.questions.length; // Allow skipping all questions if needed
+
   // Game State
   const [state, setState] = useState<AssessmentState>({
     currentQuestionIndex: 0,
@@ -61,7 +62,7 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
 
   const finishAssessment = (finalState: AssessmentState) => {
     const passedCount = finalState.answers.filter(a => a.passed).length;
-    const score = Math.round((passedCount / config.questions.length) * 100);
+    const score = config.questions.length > 0 ? Math.round((passedCount / config.questions.length) * 100) : 0;
     onComplete({ score, answers: finalState.answers });
   };
 
@@ -73,8 +74,8 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
     // Create a failed answer for the skipped question
     const skippedAnswer: AssessmentAnswer = {
         questionId: currentQ.id,
-        userPrompt: "ASSESSMENT_OVERRIDE // SKIPPED",
-        generatedImageUrl: "skipped", 
+        userPrompt: "SKIPPED",
+        generatedImageUrl: "", 
         similarityScore: 0,
         metrics: { accuracy: 0, promptEngineering: 0, creativity: 0 },
         passed: false,
@@ -210,6 +211,11 @@ const VibeAssessment: React.FC<VibeAssessmentProps> = ({ config, candidate, onCo
 
   const currentQuestion = config.questions[state.currentQuestionIndex];
   const progressPercent = ((state.currentQuestionIndex) / config.questions.length) * 100;
+
+  // Handle case where questions might be empty or index out of bounds
+  if (!currentQuestion) {
+      return <div className="p-8 text-center text-zinc-500">No questions available.</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">

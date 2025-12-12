@@ -1,0 +1,29 @@
+<svg viewBox="0 0 100 115" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Hexagon - Neon Yellow -->
+  <path 
+    d="M50 5 L93.3013 30 V80 L50 105 L6.69873 80 V30 L50 5Z" 
+    stroke="#f59e0b" 
+    stroke-width="5" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+    fill="none"
+  />
+  <!-- Inner Hexagon - Cyan/Blue Accent -->
+  <path 
+    d="M50 18 L81.1769 36 V74 L50 92 L18.8231 74 V36 L50 18Z" 
+    stroke="#06b6d4" 
+    stroke-width="2" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+    fill="none"
+    opacity="0.7"
+  />
+  <!-- Target Circle -->
+  <circle cx="50" cy="55" r="20" stroke="#f59e0b" stroke-width="3" fill="none" />
+  
+  <!-- Crosshair Lines -->
+  <line x1="50" y1="25" x2="50" y2="42" stroke="#f59e0b" stroke-width="3" />
+  <line x1="50" y1="68" x2="50" y2="85" stroke="#f59e0b" stroke-width="3" />
+  <line x1="20" y1="55" x2="37" y2="55" stroke="#f59e0b" stroke-width="3" />
+  <line x1="63" y1="55" x2="80" y2="55" stroke="#f59e0b" stroke-width="3" />
+</svg>
