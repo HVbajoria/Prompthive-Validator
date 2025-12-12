@@ -10,6 +10,10 @@
 </p>
 
 <p align="center">
+  <a href=""https://youtu.be/mhuFh62d8kY"> YouTube Video </a> | <a href="https://aistudio.google.com/apps/drive/1e0_J0G6x9f3mPYQU6WpSbyQHnNO2wGXw?fullscreenApplet=true&showPreview=true&showAssistant=true">Website Link </a>  <br/>
+</p>
+
+<p align="center">
   <a href="#overview">Overview</a> •
   <a href="#the-problem">Problem</a> •
   <a href="#our-solution">Solution</a> •
