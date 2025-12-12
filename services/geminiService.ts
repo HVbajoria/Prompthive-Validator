@@ -5,7 +5,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
  * Generates an image based on a prompt.
- * Uses gemini-2.5-flash-image for reliable access.
+ * Uses gemini-3.0-pro-preview for advanced multimodal capabilities.
  */
 export const generateImage = async (prompt: string): Promise<string> => {
   if (!prompt || !prompt.trim()) {
@@ -14,7 +14,7 @@ export const generateImage = async (prompt: string): Promise<string> => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image', 
+      model: 'gemini-3.0-pro-preview', 
       contents: {
         parts: [{ text: prompt }],
       },
@@ -92,7 +92,7 @@ export const evaluateSimilarity = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.0-pro-preview",
       contents: {
         parts: [
           { text: prompt },
@@ -189,7 +189,7 @@ export const generateRandomPromptQuestion = async (
 
   // 1. Get a creative prompt idea based on constraints
   const textResponse = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3.0-pro-preview',
     contents: systemPrompt,
   });
   

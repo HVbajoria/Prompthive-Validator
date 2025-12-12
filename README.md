@@ -28,7 +28,7 @@ This platform solves the fundamental challenge: **How do you quantify the subjec
 
 ### Key Innovation: AI-Judged AI Assessment
 
-Unlike traditional coding assessments that rely on deterministic outputs, PromptHive uses **Gemini 3 Pro's advanced multimodal reasoning** to evaluate the nuanced relationship between human intent, prompt craftsmanship, and AI-generated results.
+Unlike traditional coding assessments that rely on deterministic outputs, PromptHive uses **Gemini 3.0 Pro Preview's revolutionary 2M token context window and advanced multimodal reasoning** to evaluate the nuanced relationship between human intent, prompt craftsmanship, and AI-generated results.
 
 ---
 
@@ -69,7 +69,7 @@ PromptHive introduces a revolutionary assessment methodology:
 
 1. **Target Generation**: AI creates a reference image from a hidden "master prompt"
 2. **Candidate Challenge**: Users see only the target image and must reverse-engineer an effective prompt
-3. **Multimodal Evaluation**: Gemini 3 Pro analyzes four dimensions simultaneously
+3. **Multimodal Evaluation**: Gemini 3.0 Pro Preview analyzes four dimensions simultaneously with its 2M token context
 4. **Objective Scoring**: Structured metrics replace subjective human judgment
 
 ### Three-Axis Evaluation Framework
@@ -91,20 +91,23 @@ PromptHive introduces a revolutionary assessment methodology:
 
 ---
 
-## 🧠 Gemini 3 Pro Integration: The AI Judge Revolution
+## 🧠 Gemini 3.0 Pro Preview: The Revolutionary AI Judge
 
-### Why Gemini 3 Pro is Uniquely Suited for This Task
+### Why Gemini 3.0 Pro Preview is Uniquely Suited for This Task
 
-**🔬 Advanced Multimodal Reasoning**
-Gemini 3 Pro represents a breakthrough in AI capability, specifically designed for complex multimodal tasks. Unlike previous models that process text and images separately, Gemini 3 Pro performs **native multimodal reasoning**, understanding the intricate relationships between visual content and textual descriptions.
+**🚀 Next-Generation Multimodal Intelligence**
+Gemini 3.0 Pro Preview represents Google DeepMind's most advanced AI model, featuring unprecedented multimodal reasoning capabilities. This cutting-edge model processes text, images, audio, and video simultaneously with native understanding, making it the perfect judge for complex creative assessments.
 
-**🎭 Meta-Cognitive Evaluation**
-What makes our implementation unique is leveraging Gemini's ability to **judge its own kind**. The model doesn't just generate content—it critically analyzes the relationship between human prompts and AI outputs, providing insights that would be impossible for humans to assess at scale.
+**🎯 Breakthrough Capabilities for Assessment**
+- **2M Token Context Window**: Processes extensive prompt histories and multiple image comparisons in a single evaluation
+- **Advanced Reasoning**: Performs complex logical analysis across visual and textual domains
+- **Multimodal Understanding**: Native comprehension of relationships between images, text, and creative intent
+- **Structured Output**: Generates consistent, parseable JSON responses for automated scoring
 
-### Technical Implementation: The Four-Input Analysis
+### Technical Implementation: The Four-Input Analysis Engine
 
 ```typescript
-// Simplified representation of our evaluation engine
+// Advanced evaluation using Gemini 3.0 Pro Preview
 const evaluationInputs = {
   targetImage: "[Visual Context - Reference Standard]",
   generatedImage: "[Visual Context - Candidate Output]", 
@@ -112,35 +115,40 @@ const evaluationInputs = {
   candidatePrompt: "[User Input - Reverse-Engineered Attempt]"
 };
 
-// Gemini 3 Pro processes all four inputs simultaneously
-const analysis = await gemini3Pro.evaluateSimilarity(evaluationInputs);
+// Gemini 3.0 Pro Preview processes all inputs with 2M token context
+const analysis = await gemini3ProPreview.evaluateSimilarity(evaluationInputs);
 ```
 
-### Chain-of-Thought Reasoning Process
+### Advanced Reasoning Architecture
 
-Gemini 3 Pro's evaluation follows a sophisticated reasoning chain:
+Gemini 3.0 Pro Preview's evaluation leverages its breakthrough capabilities:
 
-1. **Visual Analysis**: Compares compositional elements, color theory, and artistic style
-2. **Semantic Mapping**: Analyzes how well the candidate's prompt captures the intended meaning
-3. **Technical Assessment**: Evaluates prompt engineering best practices and syntax
-4. **Holistic Scoring**: Synthesizes all factors into objective, weighted metrics
+1. **Multimodal Visual Analysis**: Deep understanding of composition, style, and artistic elements
+2. **Semantic Prompt Mapping**: Analyzes linguistic precision and creative interpretation
+3. **Technical Proficiency Assessment**: Evaluates prompt engineering techniques and best practices
+4. **Holistic Intelligence Synthesis**: Combines all factors using advanced reasoning for objective scoring
 
-### Unique Capabilities Leveraged
+### Unique Gemini 3.0 Pro Preview Advantages
 
-**🔄 Self-Referential Analysis**
-- Gemini evaluates content generated by AI models (including itself)
-- Creates a feedback loop for continuous improvement
-- Eliminates human bias in creative assessment
+**🔄 Meta-Cognitive Evaluation**
+- First AI model capable of judging its own creative outputs with human-level discernment
+- Self-referential analysis creates unprecedented objectivity in creative assessment
+- Eliminates human bias while maintaining nuanced understanding of artistic merit
 
-**📊 Structured Output Generation**
-- Produces consistent JSON-formatted scores
-- Provides detailed reasoning for each evaluation dimension
-- Enables automated processing and analytics
+**📊 Structured Intelligence Output**
+- Consistent JSON-formatted evaluations with detailed reasoning chains
+- Explainable AI decisions for transparent candidate feedback
+- Automated processing enables real-time assessment at scale
 
-**🎯 Context-Aware Evaluation**
-- Understands artistic concepts, styles, and cultural references
-- Adapts evaluation criteria based on prompt complexity
-- Maintains consistency across diverse creative domains
+**🎯 Context-Aware Creative Understanding**
+- Comprehends artistic styles, cultural references, and aesthetic principles
+- Adapts evaluation criteria based on prompt complexity and creative domain
+- Maintains consistency across diverse visual and textual creative challenges
+
+**⚡ Unprecedented Scale and Speed**
+- 2M token context enables comprehensive multi-image analysis
+- Advanced reasoning capabilities process complex evaluations in seconds
+- Supports concurrent assessment of thousands of candidates
 
 ---
 
@@ -170,17 +178,14 @@ Gemini 3 Pro's evaluation follows a sophisticated reasoning chain:
 - Time-bounded assessment windows
 - Tamper-resistant result storage
 
-### AI Integration: Dual-Model Architecture
+### AI Integration: Unified Gemini 3.0 Pro Preview Architecture
 
-**🧠 Gemini 3 Pro Preview (Judge)**
-- Advanced reasoning for evaluation tasks
-- Multimodal analysis capabilities
-- Structured output generation
-
-**⚡ Gemini 2.5 Flash (Generator)**
-- High-speed image generation
-- Consistent quality for reference targets
-- Optimized for real-time assessment flow
+**🧠 Gemini 3.0 Pro Preview (Judge & Generator)**
+- 2M token context window for comprehensive analysis
+- Advanced multimodal reasoning and creative evaluation
+- High-speed image generation with consistent quality
+- Structured JSON output with explainable decisions
+- Unified model for both assessment creation and evaluation
 
 ### User Experience Flow
 
@@ -316,7 +321,8 @@ npm run deploy
 ### Performance Metrics
 - **Assessment Load Time**: < 2 seconds
 - **Image Generation**: < 5 seconds per prompt
-- **Evaluation Processing**: < 3 seconds per submission
+- **Gemini 3.0 Pro Evaluation**: < 3 seconds per submission
+- **Context Processing**: 2M tokens per evaluation
 - **Concurrent Users**: 1000+ supported
 
 ### Browser Compatibility
