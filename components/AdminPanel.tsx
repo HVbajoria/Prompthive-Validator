@@ -3,7 +3,7 @@ import { Upload, Calendar, Clock, Loader2, Play, AlertTriangle, Settings, Users,
 import { AssessmentConfig, Candidate, Question, DifficultyLevel, EmailTemplate } from '../types';
 import { generateRandomPromptQuestion } from '../services/geminiService';
 import { saveTemplateToDB, deleteTemplateFromDB, getAllTemplatesFromDB } from '../services/storage';
-import { DEFAULT_TEMPLATE, parseEmail, openMailClient } from '../services/emailService';
+import { DEFAULT_TEMPLATE, parseEmail, openMailClient, sendEmailViaService } from '../services/emailService';
 import Tooltip from './Tooltip';
 import VibeAssessment from './VibeAssessment';
 
@@ -207,9 +207,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
         });
       }
       setQuestions(prev => [...prev, ...newQuestions]);
+      setSuccessMsg(`✨ Generated ${newQuestions.length} new challenge(s) successfully!`);
     } catch (e) {
       console.error(e);
-      setErrorMsg("Failed to generate assets. Ensure API Key is set and valid.");
+      setErrorMsg("❌ Failed to generate assets. Ensure API Key is set and valid.");
     } finally {
       setIsGenerating(false);
     }
@@ -279,9 +280,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
           questions
         };
         onSave(config);
+        setSuccessMsg(`🚀 Assessment "${name}" deployed successfully!`);
     } catch (err) {
         console.error("Save error:", err);
-        setErrorMsg("Failed to save configuration. Please try again.");
+        setErrorMsg("❌ Failed to save configuration. Please try again.");
     }
   };
 
@@ -318,7 +320,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
       }
   };
 
-  const handleSendEmail = (candidate: Candidate) => {
+  const handleSendEmail = async (candidate: Candidate) => {
       try {
           const template = templates.find(t => t.id === activeTemplateId) || DEFAULT_TEMPLATE;
           
@@ -334,11 +336,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onSave, initialConfig }) => {
           };
     
           const { subject, body } = parseEmail(template, candidate, currentConfigStub);
-          openMailClient(candidate.email, subject, body);
-          setSuccessMsg(`Opening mail client for ${candidate.email}...`);
+          
+          // Try EmailJS first, fallback to mailto
+          const emailSent = await sendEmailViaService(candidate.email, subject, body);
+          
+          if (emailSent) {
+              setSuccessMsg(`✅ Email sent successfully to ${candidate.email}`);
+          } else {
+              // Fallback to mail client
+              openMailClient(candidate.email, subject, body);
+              setSuccessMsg(`📧 Opening mail client for ${candidate.email}...`);
+          }
       } catch (e) {
           console.error(e);
-          setErrorMsg("Failed to open email client.");
+          setErrorMsg("❌ Failed to send email. Please try again.");
       }
   };
 
